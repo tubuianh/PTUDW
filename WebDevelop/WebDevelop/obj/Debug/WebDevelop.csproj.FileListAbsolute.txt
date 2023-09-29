@@ -77,3 +77,10 @@ D:\WebApplicationDevelop\WebDevelop\WebDevelop\obj\Debug\WebDevelop.csproj.CoreC
 D:\WebApplicationDevelop\WebDevelop\WebDevelop\obj\Debug\WebDevelop.csproj.CopyComplete
 D:\WebApplicationDevelop\WebDevelop\WebDevelop\obj\Debug\WebDevelop.dll
 D:\WebApplicationDevelop\WebDevelop\WebDevelop\obj\Debug\WebDevelop.pdb
+D:\WebApplicationDevelop\WebDevelop\WebDevelop\bin\EntityFramework.dll
+D:\WebApplicationDevelop\WebDevelop\WebDevelop\bin\EntityFramework.SqlServer.dll
+D:\WebApplicationDevelop\WebDevelop\WebDevelop\bin\MyClass.dll
+D:\WebApplicationDevelop\WebDevelop\WebDevelop\bin\MyClass.pdb
+D:\WebApplicationDevelop\WebDevelop\WebDevelop\bin\MyClass.dll.config
+D:\WebApplicationDevelop\WebDevelop\WebDevelop\bin\EntityFramework.xml
+D:\WebApplicationDevelop\WebDevelop\WebDevelop\bin\EntityFramework.SqlServer.xml
