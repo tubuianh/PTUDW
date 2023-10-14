@@ -8,6 +8,7 @@ using System.Web;
 using System.Web.Mvc;
 using MyClass.DAO;
 using MyClass.Model;
+using UDW.Library;
 
 namespace WebDevelop.Areas.Admin.Controllers
 {
@@ -45,6 +46,8 @@ namespace WebDevelop.Areas.Admin.Controllers
         //    //CREAT 
         public ActionResult Create()
         {
+            ViewBag.ListCat = new SelectList(categoriesDAO.getList("Index"),"Id","Name");
+            ViewBag.ListOrder = new SelectList(categoriesDAO.getList("Index"), "Order", "Name");
             return View();
         }
 
@@ -54,13 +57,38 @@ namespace WebDevelop.Areas.Admin.Controllers
         {
             if (ModelState.IsValid)
             {
+                //Xư lý tự động: Create at
+                categories.CreateAt = DateTime.Now;
+                //Xư lý tự động: Update at
+                categories.UpdateAt = DateTime.Now;
+                //Xư lý tự động: ParentId
+                if (categories.ParentID == null)
+                {
+                    categories.ParentID = 0;
+                }
+                //Xư lý tự động: Order
+                if (categories.Order == null)
+                {
+                    categories.Order = 1;
+                }
+                else
+                {
+                    categories.Order += 1;
+                }
+
+                //Xư lý tự động: Slug
+                categories.Slug = XString.Str_Slug(categories.Name);
+
+
+                //Chèn thêm dòng cho DB
                 categoriesDAO.Insert(categories);
                 return RedirectToAction("Index");
             }
 
-            return RedirectToAction("Index");
+            //return RedirectToAction("Index");
+            return View(categories);
         }
-
+        /// //////////////////////////////////////////////////////////////////////////
         //    // GET: Admin/Category/Edit/5
 
         //    //EDIT
@@ -79,8 +107,7 @@ namespace WebDevelop.Areas.Admin.Controllers
         }
 
         // POST: Admin/Category/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Edit(Categories categories)
@@ -120,5 +147,36 @@ namespace WebDevelop.Areas.Admin.Controllers
             
             return RedirectToAction("Index");
         }
+
+        //    // GET: Admin/Category/Delete/5
+        //STATUS
+        public ActionResult Status(int? id)
+        {
+            if (id == null)
+            {
+                //thông báo thất bại
+                TempData["message"] = new XMessage("danger", "Cập nhật trạng thái thất bại");
+                return RedirectToAction("Index");
+            }
+            else
+            {
+                //truy vấn id
+                Categories categories = categoriesDAO.getRow(id);
+
+                //chuyển đổi trạng thái của status từ 1 ->2, nếu 2 -> 1
+                categories.Status = (categories.Status == 1) ? 2 : 1;
+
+                //cạp nhật gtri updateAt
+                categories.UpdateAt = DateTime.Now;
+
+                //cập nhật lại DB
+                categoriesDAO.Update(categories);
+                //Thông báo cập nhật thành công
+                TempData["message"] = new XMessage("success", "Cập nhật  trạng thái thành công");
+                return RedirectToAction("Index");
+            }
+        }
+
+
     }
 }
