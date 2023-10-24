@@ -9,14 +9,14 @@
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="/Public/plugins/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" href="~/Public/plugins/fontawesome-free/css/all.min.css">
     <!-- Theme style -->
-    <link rel="stylesheet" href="/Public/dist/css/adminlte.min.css">
-
+    <link rel="stylesheet" href="~/Public/dist/css/adminlte.min.css">
+    <link href="~/Public/css/LayoutAdmin.css" rel="stylesheet" />
     <!-- jQuery -->
     <style>
-        .btn-sm{
-            margin-left:0.3125rem;
+        .btn-sm {
+            margin-left: 0.3125rem;
         }
     </style>
 
@@ -39,6 +39,7 @@
                     <a href="#" class="nav-link">Contact</a>
                 </li>
             </ul>
+
 
             <!-- Right navbar links -->
             <ul class="navbar-nav ml-auto">
@@ -213,13 +214,16 @@
 
     </div>
 
-    <script src="Public/plugins/jquery/jquery.min.js"></script>
+
+    <!-- jQuery -->
+    <script src="~/Public/plugins/jquery/jquery.min.js"></script>
     <!-- Bootstrap 4 -->
-    <script src="Public/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="~/Public/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
     <!-- AdminLTE App -->
-    <script src="Public/dist/js/adminlte.min.js"></script>
+    <script src="~/Public/dist/js/adminlte.min.js"></script>
     <!-- AdminLTE for demo purposes -->
-    <script src="Public/dist/js/demo.js"></script>
+    <script src="~/Public/dist/js/demo.js"></script>
+
 
     @RenderSection("footer", required: false)
 </body>

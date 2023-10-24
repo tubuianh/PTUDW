@@ -31,12 +31,14 @@ namespace WebDevelop.Areas.Admin.Controllers
         {
             if (id == null)
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                TempData["message"] = new XMessage("danger", "Không tồn tại loại sản phẩm");
+                return RedirectToAction("Index");
             }
             Categories categories = categoriesDAO.getRow(id);
             if (categories == null)
             {
-                return HttpNotFound();
+                TempData["message"] = new XMessage("danger", "Không tồn tại loại sản phẩm");
+                return RedirectToAction("Index");
             }
             return View(categories);
         }
@@ -82,9 +84,13 @@ namespace WebDevelop.Areas.Admin.Controllers
 
                 //Chèn thêm dòng cho DB
                 categoriesDAO.Insert(categories);
+                //thông báo thêm danh mục sản phẩm thành công
+                //Thông báo cập nhật thành công
+                TempData["message"] = new XMessage("success", "Tạo mới loại sản phẩm thành công");
                 return RedirectToAction("Index");
             }
-
+            ViewBag.ListCat = new SelectList(categoriesDAO.getList("Index"), "Id", "Name");
+            ViewBag.ListOrder = new SelectList(categoriesDAO.getList("Index"), "Order", "Name");
             //return RedirectToAction("Index");
             return View(categories);
         }
@@ -96,13 +102,19 @@ namespace WebDevelop.Areas.Admin.Controllers
         {
             if (id == null)
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                //Thông báo cập nhật thất bại
+                TempData["message"] = new XMessage("danger", "Không tìm thấy mẫu tin");
+                return RedirectToAction("Index");
             }
-            Categories categories = categoriesDAO.getRow(id);
+                Categories categories = categoriesDAO.getRow(id);
             if (categories == null)
             {
-                return HttpNotFound();
-            }
+                    //Thông báo cập nhật thất bại
+                    TempData["message"] = new XMessage("danger", "Không tìm thấy mẫu tin");
+                    return RedirectToAction("Index");
+                }
+            ViewBag.ListCat = new SelectList(categoriesDAO.getList("Index"), "Id", "Name");
+            ViewBag.ListOrder = new SelectList(categoriesDAO.getList("Index"), "Order", "Name");
             return View(categories);
         }
 
@@ -114,9 +126,33 @@ namespace WebDevelop.Areas.Admin.Controllers
         {
             if (ModelState.IsValid)
             {
+                //xu ly tu dong: slug
+                categories.Slug = XString.Str_Slug(categories.Name);
+                //xy ly tu dong : parent id
+                if(categories.ParentID == null)
+                {
+                    categories.ParentID = 0;
+                }
+                //xu ly tu dong : order
+                if (categories.Order == null)
+                {
+                    categories.Order = 1;
+                }
+                else
+                {
+                    categories.Order += 1;
+                }
+                //xu ly tu dong: updataAt
+                categories.UpdateAt = DateTime.Now;
+
+                //cap nhat mau tin
                 categoriesDAO.Update(categories);
+                //Thông báo cập nhật thành công
+                TempData["message"] = new XMessage("success", "Cập nhật mẫu tin thành công");
                 return RedirectToAction("Index");
             }
+            ViewBag.ListCat = new SelectList(categoriesDAO.getList("Index"), "Id", "Name");
+            ViewBag.ListOrder = new SelectList(categoriesDAO.getList("Index"), "Order", "Name");
             return View(categories);
         }
 
@@ -127,12 +163,16 @@ namespace WebDevelop.Areas.Admin.Controllers
         {
             if (id == null)
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                //thông báo thất bại
+                TempData["message"] = new XMessage("danger", "Xóa mẫu tin thất bại !");
+                return RedirectToAction("Index");
             }
             Categories categories = categoriesDAO.getRow(id);
             if (categories == null)
             {
-                return HttpNotFound();
+                //thông báo thất bại
+                TempData["message"] = new XMessage("danger", "Xóa mẫu tin thất bại !");
+                return RedirectToAction("Index");
             }
             return View(categories);
         }
@@ -144,8 +184,10 @@ namespace WebDevelop.Areas.Admin.Controllers
         {
             Categories categories = categoriesDAO.getRow(id);
             categoriesDAO.Delete(categories);
-            
-            return RedirectToAction("Index");
+
+            //thông báo thành công
+            TempData["message"] = new XMessage("success", "Xóa mẫu tin thành công !");
+            return RedirectToAction("Trash");
         }
 
         //    // GET: Admin/Category/Delete/5
@@ -158,11 +200,17 @@ namespace WebDevelop.Areas.Admin.Controllers
                 TempData["message"] = new XMessage("danger", "Cập nhật trạng thái thất bại");
                 return RedirectToAction("Index");
             }
+            //truy vấn dòng có id = id yêu cầu
+            Categories categories = categoriesDAO.getRow(id);
+            if (categories == null)
+            {
+                //thông báo thất bại
+                TempData["message"] = new XMessage("danger", "Cập nhật trạng thái thất bại");
+                return RedirectToAction("Index");
+            }
             else
             {
-                //truy vấn id
-                Categories categories = categoriesDAO.getRow(id);
-
+               
                 //chuyển đổi trạng thái của status từ 1 ->2, nếu 2 -> 1
                 categories.Status = (categories.Status == 1) ? 2 : 1;
 
@@ -173,6 +221,82 @@ namespace WebDevelop.Areas.Admin.Controllers
                 categoriesDAO.Update(categories);
                 //Thông báo cập nhật thành công
                 TempData["message"] = new XMessage("success", "Cập nhật  trạng thái thành công");
+                return RedirectToAction("Index");
+            }
+        }
+
+        //DelTrash
+        public ActionResult DelTrash(int? id)
+        {
+            if (id == null)
+            {
+                //thông báo thất bại
+                TempData["message"] = new XMessage("danger", "Không tìm thấy mẫu tin");
+                return RedirectToAction("Index");
+            }
+            //truy vấn dòng có id = id yêu cầu
+            Categories categories = categoriesDAO.getRow(id);
+            if (categories == null)
+            {
+                //thông báo thất bại
+                TempData["message"] = new XMessage("danger", "Không tìm thấy mẫu tin");
+                return RedirectToAction("Index");
+            }
+            else
+            {
+
+                //chuyển đổi trạng thái của status từ 1,2 -> 0, không hiển thị ở index
+                categories.Status = 0;
+
+                //cạp nhật gtri updateAt
+                categories.UpdateAt = DateTime.Now;
+
+                //cập nhật lại DB
+                categoriesDAO.Update(categories);
+                //Thông báo cập nhật thành công
+                TempData["message"] = new XMessage("success", "Xóa mẫu tin thành công");
+                return RedirectToAction("Index");
+            }
+        }
+
+        //Trash
+
+        // GET: Admin/Category/trash
+        public ActionResult Trash()
+        {
+            return View(categoriesDAO.getList("Trash"));
+        }
+
+        //Recover
+        public ActionResult Recover(int? id)
+        {
+            if (id == null)
+            {
+                //thông báo thất bại
+                TempData["message"] = new XMessage("danger", "Phục hồi mẫu tin thất bại!");
+                return RedirectToAction("Index");
+            }
+            //truy vấn dòng có id = id yêu cầu
+            Categories categories = categoriesDAO.getRow(id);
+            if (categories == null)
+            {
+                //thông báo thất bại
+                TempData["message"] = new XMessage("danger", "Phục hồi mẫu tin thất bại!");
+                return RedirectToAction("Index");
+            }
+            else
+            {
+
+                //chuyển đổi trạng thái của status từ 0->2: ko xuat ban
+                categories.Status =2;
+
+                //cạp nhật gtri updateAt
+                categories.UpdateAt = DateTime.Now;
+
+                //cập nhật lại DB
+                categoriesDAO.Update(categories);
+                //Thông báo phục hồi thành công
+                TempData["message"] = new XMessage("success", "Phục hồi mẫu tin thành công!");
                 return RedirectToAction("Index");
             }
         }
