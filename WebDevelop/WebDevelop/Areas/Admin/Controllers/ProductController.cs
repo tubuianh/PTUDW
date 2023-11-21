@@ -13,75 +13,67 @@ using System.IO;
 
 namespace WebDevelop.Areas.Admin.Controllers
 {
-    public class SupplierController : Controller
+    public class ProductController : Controller
     {
+        ProductsDAO productsDAO = new ProductsDAO();
+        CategoriesDAO categoriesDAO = new CategoriesDAO();
         SuppliersDAO suppliersDAO = new SuppliersDAO();
-
-
-        /// /////////////////////////////////////////////////////////////////////////////////
-        // GET: Admin/Supplier
+        /// /////////////////////////////////////////
+        /// <returns></returns>
+        // GET: Admin/Product
         public ActionResult Index()
         {
-            return View(suppliersDAO.getList("Index"));
+            return View(productsDAO.getList("Index"));
         }
 
-
-
-        /// /////////////////////////////////////////////////////////////////////////////////
-        // GET: Admin/Supplier/Details/5
+        /// /////////////////////////////////////////
+        // GET: Admin/Product/Details/5
         public ActionResult Details(int? id)
         {
             if (id == null)
             {
-                TempData["message"] = new XMessage("danger", "Không tồn tại nhà cung cấp");
+                //thong bao that bai
+                TempData["message"] = new XMessage("danger", "Không tồn tại sản phẩm");
                 return RedirectToAction("Index");
             }
-            Suppliers suppliers = suppliersDAO.getRow(id);
-            if (suppliers == null)
+            Products products = productsDAO.getRow(id);
+            if (products == null)
             {
-                TempData["message"] = new XMessage("danger", "Không tồn tại nhà cung cấp");
+                //thong bao that bai
+                TempData["message"] = new XMessage("danger", "Không tồn tại sản phẩm");
                 return RedirectToAction("Index");
             }
-            return View(suppliers);
+            return View(products);
         }
 
-        /// /////////////////////////////////////////////////////////////////////////////////
-        // GET: Admin/Supplier/Create
+
+        /// /////////////////////////////////////////
+        // GET: Admin/Product/Create
         public ActionResult Create()
         {
-            ViewBag.ListOrder = new SelectList(suppliersDAO.getList("Index"), "Order", "Name");
+            ViewBag.ListCatID = new SelectList(categoriesDAO.getList("Index"), "Id", "Name"); //CatID - truy van tu bang Categories
+            ViewBag.ListSupID = new SelectList(suppliersDAO.getList("Index"), "Id", "Name"); // SupID - truy van tu bang Suppliers
+            //dung de lua chon tu danh sach droplist nhu bang Categories : ParentID va Suppliers : ParentID
             return View();
         }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(Suppliers suppliers)
+        public ActionResult Create(Products products)
         {
             if (ModelState.IsValid)
             {
-                //xu ly tu dong cho cac truong: slug, create, createAt/By,  updaeAt/By, order
+                //xu ly thong tin tu dong cho mot so truong
                 //Xư lý tự động: Create at
-                suppliers.CreateAt = DateTime.Now;
+                products.CreateAt = DateTime.Now;
                 //Xư lý tự động: Update at
-                suppliers.UpdateAt = DateTime.Now;
+                products.UpdateAt = DateTime.Now;
 
                 //Xư lý tự động: Create by
-                suppliers.CreateBy = Convert.ToInt32(Session["UserID"]);
+                products.CreateBy = Convert.ToInt32(Session["UserID"]);
                 //Xư lý tự động: Update by
-                suppliers.UpdateBy = Convert.ToInt32(Session["UserID"]);
+                products.UpdateBy = Convert.ToInt32(Session["UserID"]);
 
-                //Xư lý tự động: Order
-                if (suppliers.Order == null)
-                {
-                    suppliers.Order = 1;
-                }
-                else
-                {
-                    suppliers.Order += 1;
-                }
-
-                //Xư lý tự động: Slug
-                suppliers.Slug = XString.Str_Slug(suppliers.Name);
+                products.Slug = XString.Str_Slug(products.Name);
 
                 //xu ly cho phan upload hình ảnh
                 var img = Request.Files["img"];//lay thong tin file
@@ -91,151 +83,133 @@ namespace WebDevelop.Areas.Admin.Controllers
                     //kiem tra tap tin co hay khong
                     if (FileExtentions.Contains(img.FileName.Substring(img.FileName.LastIndexOf("."))))//lay phan mo rong cua tap tin
                     {
-                        string slug = suppliers.Slug;
+                        string slug = products.Slug;
                         //ten file = Slug + phan mo rong cua tap tin
                         string imgName = slug + img.FileName.Substring(img.FileName.LastIndexOf("."));
-                        suppliers.Img = imgName;
+                        products.Img = imgName;
                         //upload hinh
-                        string PathDir = "~/Public/img/supplier";                       
+                        string PathDir = "~/Public/img/product";
                         string PathFile = Path.Combine(Server.MapPath(PathDir), imgName);
                         img.SaveAs(PathFile);
                     }
                 }//ket thuc phan upload hinh anh
-                //tao du lieu thanh cong
-                suppliersDAO.Insert(suppliers);
-                TempData["message"] = new XMessage("success", "Tạo mới nhà cung cấp thành công");
+
+                //luu vao DB
+                productsDAO.Insert(products);
+                TempData["message"] = new XMessage("success", "Tạo mới sản phẩm thành công");
                 return RedirectToAction("Index");
             }
-            ViewBag.ListOrder = new SelectList(suppliersDAO.getList("Index"), "Order", "Name");
-            return View(suppliers);
+
+            ViewBag.ListCatID = new SelectList(categoriesDAO.getList("Index"), "Id", "Name"); //CatID - truy van tu bang Categories
+            ViewBag.ListSupID = new SelectList(suppliersDAO.getList("Index"), "Id", "Name"); // SupID - truy van tu bang Suppliers
+            return View(products);
         }
 
-        /// /////////////////////////////////////////////////////////////////////////////////
-        // GET: Admin/Supplier/Edit/5
+
+        /// /////////////////////////////////////////
+        // GET: Admin/Product/Edit/5
         public ActionResult Edit(int? id)
         {
             if (id == null)
             {
-                TempData["message"] = new XMessage("danger", "Không tồn tại nhà cung cấp");
+                //thong bao that bai
+                TempData["message"] = new XMessage("danger", "Không tồn tại sản phẩm");
                 return RedirectToAction("Index");
             }
-            Suppliers suppliers = suppliersDAO.getRow(id);
-            if (suppliers == null)
+            Products products = productsDAO.getRow(id);
+            if (products == null)
             {
-                TempData["message"] = new XMessage("danger", "Không tồn tại nhà cung cấp");
+                //thong bao that bai
+                TempData["message"] = new XMessage("danger", "Không tồn tại sản phẩm");
                 return RedirectToAction("Index");
             }
-            ViewBag.ListOrder = new SelectList(suppliersDAO.getList("Index"), "Order", "Name");
-            return View(suppliers);
+            return View(products);
         }
-
-
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(Suppliers suppliers)
+        public ActionResult Edit(Products products)
         {
             if (ModelState.IsValid)
             {
                 //xu ly tu dong cho cac truong: slug, create, createAt/By,  updaeAt/By, order
-               
+
                 //Xư lý tự động: Update at
-                suppliers.UpdateAt = DateTime.Now;
+                products.UpdateAt = DateTime.Now;
 
-                //Xư lý tự động: Order
-                if (suppliers.Order == null)
-                {
-                    suppliers.Order = 1;
-                }
-                else
-                {
-                    suppliers.Order += 1;
-                }
-
-                suppliers.Slug = XString.Str_Slug(suppliers.Name);
+                products.Slug = XString.Str_Slug(products.Name);
 
                 var img = Request.Files["img"];//lay thong tin file
-                string PathDir = "~/Public/img/supplier";
+                string PathDir = "~/Public/img/product";
 
-                if (img.ContentLength != 0 && suppliers.Img != null)
+                if (img.ContentLength != 0 && products.Img != null)
                 {
-                    string DelPath = Path.Combine(Server.MapPath(PathDir), suppliers.Img);
+                    string DelPath = Path.Combine(Server.MapPath(PathDir), products.Img);
                     System.IO.File.Delete(DelPath);
                 }
 
                 if (img.ContentLength != 0)
                 {
-                    
+
                     string[] FileExtentions = new string[] { ".jpg", ".jpeg", ".png", ".gif" };
                     //kiem tra tap tin co hay khong
                     if (FileExtentions.Contains(img.FileName.Substring(img.FileName.LastIndexOf("."))))//lay phan mo rong cua tap tin
                     {
-                        string slug = suppliers.Slug;
+                        string slug = products.Slug;
                         //ten file = Slug + phan mo rong cua tap tin
                         string imgName = slug + img.FileName.Substring(img.FileName.LastIndexOf("."));
-                        suppliers.Img = imgName;
+                        products.Img = imgName;
                         //upload hinh
-                        
+
                         string PathFile = Path.Combine(Server.MapPath(PathDir), imgName);
                         img.SaveAs(PathFile);
                     }
-                    //if (suppliers.Img != null)
-                    //{
-                    //    string DelPath = Path.Combine(Server.MapPath(PathDir), suppliers.Img);
-                    //    System.IO.File.Delete(DelPath);
-                    //}
+
                 }
-               
-                    //Xư lý tự động: Slug
-                   
+
+                //Xư lý tự động: Slug
+
                 //cap nhat mau tin vao db
-                suppliersDAO.Update(suppliers);
-                TempData["message"] = new XMessage("success", "Cập nhật nhà cung cấp thành công");
+                productsDAO.Update(products);
+                TempData["message"] = new XMessage("success", "Cập nhật sản phẩm thành công");
                 return RedirectToAction("Index");
             }
-            ViewBag.ListOrder = new SelectList(suppliersDAO.getList("Index"), "Order", "Name");
-            return View(suppliers);
+            return View(products);
         }
 
 
-        /// /////////////////////////////////////////////////////////////////////////////////
-        // GET: Admin/Supplier/Delete/5
+        /// /////////////////////////////////////////
+        // GET: Admin/Product/Delete/5
         public ActionResult Delete(int? id)
         {
             if (id == null)
             {
-                TempData["message"] = new XMessage("danger", "Không tồn tại nhà cung cấp");
+                //thong bao that bai
+                TempData["message"] = new XMessage("danger", "Không tồn tại sản phẩm");
                 return RedirectToAction("Index");
             }
-            Suppliers suppliers = suppliersDAO.getRow(id);
-            if (suppliers == null)
+            Products products = productsDAO.getRow(id);
+            if (products == null)
             {
-                TempData["message"] = new XMessage("danger", "Không tồn tại nhà cung cấp");
+                //thong bao that bai
+                TempData["message"] = new XMessage("danger", "Không tồn tại sản phẩm");
                 return RedirectToAction("Index");
             }
-            return View(suppliers);
+            return View(products);
         }
 
-        // POST: Admin/Supplier/Delete/5
+        // POST: Admin/Product/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            Suppliers suppliers = suppliersDAO.getRow(id);
-            var img = Request.Files["img"];//lay thong tin file
-            string PathDir = "~/Public/img/supplier";
-            //xoa mau tin ra khoi db
-            if (suppliersDAO.Delete(suppliers)==1)
-            {
-                if(suppliers.Img != null)
-                {
-                    string DelPath = Path.Combine(Server.MapPath(PathDir), suppliers.Img);
-                    System.IO.File.Delete(DelPath);
-                }
-            }    
-            TempData["message"] = new XMessage("success", "Xóa nhà cung cấp thành công");
+            Products products = productsDAO.getRow(id);
+            productsDAO.Delete(products);
+            //thong bao xoa san pham thanh cong
+            TempData["message"] = new XMessage("success", "Xóa sản phẩm thành công");
             return RedirectToAction("Trash");
         }
 
+        /// /////////////////////////////////////////
         //phat sinh them 1 so action: status, trash, deltrash, undo
         //status
         public ActionResult Status(int? id)
@@ -247,8 +221,8 @@ namespace WebDevelop.Areas.Admin.Controllers
                 return RedirectToAction("Index");
             }
             //truy vấn dòng có id = id yêu cầu
-            Suppliers suppliers = suppliersDAO.getRow(id);
-            if (suppliers == null)
+            Products products = productsDAO.getRow(id);
+            if (products == null)
             {
                 //thông báo thất bại
                 TempData["message"] = new XMessage("danger", "Cập nhật trạng thái thất bại");
@@ -258,19 +232,21 @@ namespace WebDevelop.Areas.Admin.Controllers
             {
 
                 //chuyển đổi trạng thái của status từ 1 ->2, nếu 2 -> 1
-                suppliers.Status = (suppliers.Status == 1) ? 2 : 1;
+                products.Status = (products.Status == 1) ? 2 : 1;
 
                 //cạp nhật gtri updateAt
-                suppliers.UpdateAt = DateTime.Now;
+                products.UpdateAt = DateTime.Now;
 
                 //cập nhật lại DB
-                suppliersDAO.Update(suppliers);
+                productsDAO.Update(products);
                 //Thông báo cập nhật thành công
                 TempData["message"] = new XMessage("success", "Cập nhật  trạng thái thành công");
                 return RedirectToAction("Index");
             }
         }
 
+
+        /// /////////////////////////////////////////
         //DelTrash
         public ActionResult DelTrash(int? id)
         {
@@ -281,8 +257,8 @@ namespace WebDevelop.Areas.Admin.Controllers
                 return RedirectToAction("Index");
             }
             //truy vấn dòng có id = id yêu cầu
-            Suppliers suppliers = suppliersDAO.getRow(id);
-            if (suppliers == null)
+            Products products = productsDAO.getRow(id);
+            if (products == null)
             {
                 //thông báo thất bại
                 TempData["message"] = new XMessage("danger", "Không tìm thấy mẫu tin");
@@ -292,25 +268,27 @@ namespace WebDevelop.Areas.Admin.Controllers
             {
 
                 //chuyển đổi trạng thái của status từ 1,2 -> 0, không hiển thị ở index
-                suppliers.Status = 0;
+                products.Status = 0;
 
                 //cạp nhật gtri updateAt
-                suppliers.UpdateAt = DateTime.Now;
+                products.UpdateAt = DateTime.Now;
 
                 //cập nhật lại DB
-                suppliersDAO.Update(suppliers);
+                productsDAO.Update(products);
                 //Thông báo cập nhật thành công
                 TempData["message"] = new XMessage("success", "Xóa mẫu tin thành công");
                 return RedirectToAction("Index");
             }
         }
 
+
+        /// /////////////////////////////////////////
         //Trash
 
-        // GET: Admin/supplier/trash
+        // GET: Admin/product/trash
         public ActionResult Trash()
         {
-            return View(suppliersDAO.getList("Trash"));
+            return View(productsDAO.getList("Trash"));
         }
 
         //Recover
@@ -323,8 +301,8 @@ namespace WebDevelop.Areas.Admin.Controllers
                 return RedirectToAction("Index");
             }
             //truy vấn dòng có id = id yêu cầu
-            Suppliers suppliers = suppliersDAO.getRow(id);
-            if (suppliers == null)
+            Products products = productsDAO.getRow(id);
+            if (products == null)
             {
                 //thông báo thất bại
                 TempData["message"] = new XMessage("danger", "Phục hồi mẫu tin thất bại!");
@@ -334,19 +312,18 @@ namespace WebDevelop.Areas.Admin.Controllers
             {
 
                 //chuyển đổi trạng thái của status từ 0->2: ko xuat ban
-                suppliers.Status = 2;
+                products.Status = 2;
 
                 //cạp nhật gtri updateAt
-                suppliers.UpdateAt = DateTime.Now;
+                products.UpdateAt = DateTime.Now;
 
                 //cập nhật lại DB
-                suppliersDAO.Update(suppliers);
+                productsDAO.Update(products);
                 //Thông báo phục hồi thành công
                 TempData["message"] = new XMessage("success", "Phục hồi mẫu tin thành công!");
                 return RedirectToAction("Index");
             }
         }
-
 
     }
 }
