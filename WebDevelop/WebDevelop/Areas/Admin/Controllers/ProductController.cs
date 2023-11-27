@@ -123,6 +123,8 @@ namespace WebDevelop.Areas.Admin.Controllers
                 TempData["message"] = new XMessage("danger", "Không tồn tại sản phẩm");
                 return RedirectToAction("Index");
             }
+            ViewBag.ListCatID = new SelectList(categoriesDAO.getList("Index"), "Id", "Name"); //CatID - truy van tu bang Categories
+            ViewBag.ListSupID = new SelectList(suppliersDAO.getList("Index"), "Id", "Name"); // SupID - truy van tu bang Suppliers
             return View(products);
         }
         [HttpPost]
@@ -321,7 +323,7 @@ namespace WebDevelop.Areas.Admin.Controllers
                 productsDAO.Update(products);
                 //Thông báo phục hồi thành công
                 TempData["message"] = new XMessage("success", "Phục hồi mẫu tin thành công!");
-                return RedirectToAction("Index");
+                return RedirectToAction("Trash");
             }
         }
 
