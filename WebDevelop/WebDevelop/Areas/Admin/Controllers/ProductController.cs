@@ -18,8 +18,7 @@ namespace WebDevelop.Areas.Admin.Controllers
         ProductsDAO productsDAO = new ProductsDAO();
         CategoriesDAO categoriesDAO = new CategoriesDAO();
         SuppliersDAO suppliersDAO = new SuppliersDAO();
-        /// /////////////////////////////////////////
-        /// <returns></returns>
+
         // GET: Admin/Product
         public ActionResult Index()
         {
@@ -161,7 +160,7 @@ namespace WebDevelop.Areas.Admin.Controllers
                         string imgName = slug + img.FileName.Substring(img.FileName.LastIndexOf("."));
                         products.Img = imgName;
                         //upload hinh
-
+                       
                         string PathFile = Path.Combine(Server.MapPath(PathDir), imgName);
                         img.SaveAs(PathFile);
                     }

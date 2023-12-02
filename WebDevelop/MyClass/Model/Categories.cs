@@ -22,6 +22,7 @@ namespace MyClass.Model
 
         [Display(Name = "Tên rút gọn")]
         public string Slug { get; set; }
+
         [Display(Name = "Cấp cha")]
         public int? ParentID { get; set; }
 

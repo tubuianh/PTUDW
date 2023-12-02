@@ -178,11 +178,7 @@ namespace WebDevelop.Areas.Admin.Controllers
                         string PathFile = Path.Combine(Server.MapPath(PathDir), imgName);
                         img.SaveAs(PathFile);
                     }
-                    //if (suppliers.Img != null)
-                    //{
-                    //    string DelPath = Path.Combine(Server.MapPath(PathDir), suppliers.Img);
-                    //    System.IO.File.Delete(DelPath);
-                    //}
+
                 }
                
                     //Xư lý tự động: Slug
